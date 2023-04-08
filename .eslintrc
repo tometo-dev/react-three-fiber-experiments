@@ -21,7 +21,8 @@
       "error",
       { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }
     ],
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "react/no-unknown-property": "off", // it doesn't work nicely with R3F
   },
   "settings": {
     "react": {
