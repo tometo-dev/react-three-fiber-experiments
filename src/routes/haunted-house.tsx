@@ -1,6 +1,8 @@
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, MeshProps } from "@react-three/fiber";
 import { folder, useControls } from "leva";
+
+import * as doorAssets from "@/assets/haunted-house/textures/door";
 
 function Bush(props: MeshProps) {
   return (
@@ -8,6 +10,32 @@ function Bush(props: MeshProps) {
       <sphereBufferGeometry args={[1, 16, 16]} />
       <meshStandardMaterial color="#89c854" />
     </mesh>
+  );
+}
+
+function Door() {
+  const textureProps = {
+    ...useTexture({
+      map: doorAssets.color,
+      alphaMap: doorAssets.alpha,
+      aoMap: doorAssets.ao,
+      displacementMap: doorAssets.height,
+      normalMap: doorAssets.normal,
+      metalnessMap: doorAssets.metalness,
+      roughnessMap: doorAssets.roughness,
+    }),
+    metalness: 1,
+    displacementScale: 0.1,
+  };
+
+  return (
+    <>
+      <pointLight position={[0, 2.2, 2.7]} intensity={1} decay={7} castShadow />
+      <mesh name="door" position={[0, 1, 2.001]} receiveShadow>
+        <planeBufferGeometry args={[2, 2, 100, 100]} />
+        <meshStandardMaterial transparent {...textureProps} />
+      </mesh>
+    </>
   );
 }
 
@@ -26,14 +54,13 @@ export function HauntedHouse() {
   });
 
   return (
-    <Canvas className="h-full w-full">
+    <Canvas className="h-full w-full" dpr={[1, 2]} camera={{ position: [0, 5, 15] }}>
       <ambientLight intensity={ambientLight.intensity} color="#ffffff" />
       <directionalLight
         intensity={directionalLight.intensity}
         color="#ffffff"
         position={[directionalLight.x, directionalLight.y, directionalLight.z]}
       />
-      <PerspectiveCamera makeDefault position={[4, 2, 5]} fov={75} near={0.1} far={100} />
       <OrbitControls enableDamping />
       <group>
         <mesh name="walls" position={[0, 1.25, 0]}>
@@ -46,10 +73,7 @@ export function HauntedHouse() {
           <meshStandardMaterial color="#b35f45" />
         </mesh>
 
-        <mesh name="door" position={[0, 1, 2.001]}>
-          <planeBufferGeometry args={[2, 2, 100, 100]} />
-          <meshStandardMaterial color="#a9c388" />
-        </mesh>
+        <Door />
 
         <Bush name="bush-1" scale={[0.5, 0.5, 0.5]} position={[0.8, 0.2, 2.2]} />
         <Bush name="bush-2" scale={[0.25, 0.25, 0.25]} position={[1.4, 0.1, 2.1]} />
