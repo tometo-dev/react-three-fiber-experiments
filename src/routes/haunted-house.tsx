@@ -11,9 +11,25 @@ import * as graveAssets from "@/assets/haunted-house/textures/grave";
 
 function Bush(props: MeshProps) {
   return (
-    <mesh {...props}>
+    <mesh castShadow {...props}>
       <sphereBufferGeometry args={[1, 16, 16]} />
-      <meshStandardMaterial color="#89c854" />
+      <meshStandardMaterial color="#003300" />
+    </mesh>
+  );
+}
+
+function Walls() {
+  const textureProps = useTexture({
+    map: wallAssets.color,
+    aoMap: wallAssets.ao,
+    normalMap: wallAssets.normal,
+    roughnessMap: wallAssets.roughness,
+  });
+
+  return (
+    <mesh name="walls" position={[0, 1.25, 0]} castShadow>
+      <boxBufferGeometry args={[4, 2.5, 4]} />
+      <meshStandardMaterial {...textureProps} />
     </mesh>
   );
 }
@@ -34,28 +50,22 @@ function Door() {
 
   return (
     <>
-      <pointLight position={[0, 2.2, 2.7]} intensity={1} decay={7} castShadow />
+      <pointLight
+        name="doorlight"
+        color="#ff7d46"
+        position={[0, 2.2, 2.7]}
+        intensity={1}
+        distance={7}
+        castShadow
+        shadow-mapSize-height={256}
+        shadow-mapSize-width={256}
+        shadow-camera-far={7}
+      />
       <mesh name="door" position={[0, 1, 2.001]} receiveShadow>
         <planeBufferGeometry args={[2, 2, 100, 100]} />
         <meshStandardMaterial transparent {...textureProps} />
       </mesh>
     </>
-  );
-}
-
-function Walls() {
-  const textureProps = useTexture({
-    map: wallAssets.color,
-    aoMap: wallAssets.ao,
-    normalMap: wallAssets.normal,
-    roughnessMap: wallAssets.roughness,
-  });
-
-  return (
-    <mesh name="walls" position={[0, 1.25, 0]}>
-      <boxBufferGeometry args={[4, 2.5, 4]} />
-      <meshStandardMaterial {...textureProps} />
-    </mesh>
   );
 }
 
@@ -87,8 +97,8 @@ function Floor() {
   }, [textures]);
 
   return (
-    <mesh name="floor" rotation={[-Math.PI * 0.5, 0, 0]}>
-      <planeBufferGeometry args={[20, 20]} />
+    <mesh name="floor" rotation-x={-Math.PI * 0.5} receiveShadow>
+      <planeBufferGeometry args={[40, 40]} />
       <meshStandardMaterial {...textureProps} />
     </mesh>
   );
@@ -96,7 +106,7 @@ function Floor() {
 
 function Grave({ minRadius }: { minRadius: number }) {
   const { rotation: rotationDelta, radius: radiusDelta } = useControls("Grave", {
-    radius: { value: 3, min: 0, max: 10 },
+    radius: { value: 5, min: 0, max: 10 },
     rotation: { value: 0.5, min: -1, max: 1 },
   });
 
@@ -115,8 +125,8 @@ function Grave({ minRadius }: { minRadius: number }) {
 
 function Graves() {
   const { number, minRadius } = useControls("Graves", {
-    number: { value: 50, min: 30, max: 100, step: 1 },
-    minRadius: { value: 3, min: 3, max: 7, step: 0.01 },
+    number: { value: 69, min: 30, max: 100, step: 1 },
+    minRadius: { value: 4.2, min: 3, max: 7, step: 0.01 },
   });
 
   const textureProps = useTexture({
@@ -125,7 +135,7 @@ function Graves() {
   });
 
   return (
-    <Instances>
+    <Instances castShadow>
       <boxGeometry args={[0.6, 0.8, 0.2]} />
       <meshStandardMaterial {...textureProps} />
       {Array.from({ length: number }, (_, i) => (
@@ -137,11 +147,11 @@ function Graves() {
 
 export function HauntedHouse() {
   const ambientLight = useControls("Ambient Light", {
-    intensity: { value: 0.5, min: 0, max: 1, step: 0.001 },
+    intensity: { value: 0.3, min: 0, max: 1, step: 0.001 },
   });
 
   const directionalLight = useControls("Directional Light", {
-    intensity: { value: 0.5, min: 0, max: 1, step: 0.001 },
+    intensity: { value: 0.12, min: 0, max: 1, step: 0.001 },
     position: folder({
       x: { value: 4, min: -5, max: 5, step: 0.001 },
       y: { value: 5, min: -5, max: 5, step: 0.001 },
@@ -150,18 +160,29 @@ export function HauntedHouse() {
   });
 
   return (
-    <Canvas className="h-full w-full" dpr={[1, 2]} camera={{ position: [0, 5, 15] }}>
+    <Canvas
+      className="h-full w-full"
+      dpr={[1, 2]}
+      camera={{ position: [0, 5, 13] }}
+      shadows
+      onCreated={(state) => state.gl.setClearColor("#262837")}
+    >
       <ambientLight intensity={ambientLight.intensity} color="#ffffff" />
       <directionalLight
+        name="moonlight"
         intensity={directionalLight.intensity}
-        color="#ffffff"
+        color="#b9d5ff"
         position={[directionalLight.x, directionalLight.y, directionalLight.z]}
+        castShadow
+        shadow-mapSize-width={256}
+        shadow-mapSize-height={256}
+        shadow-camera-far={15}
       />
-      <OrbitControls enableDamping />
+      <OrbitControls enableDamping maxPolarAngle={Math.PI * 0.5 - 0.01} />
       <group>
         <Walls />
 
-        <mesh name="roof" rotation={[0, Math.PI * 0.25, 0]} position={[0, 2.5 + 0.5, 0]}>
+        <mesh name="roof" rotation-y={Math.PI * 0.25} position={[0, 2.5 + 0.5, 0]}>
           <coneBufferGeometry args={[3.5, 1, 4]} />
           <meshStandardMaterial color="#b35f45" />
         </mesh>
@@ -177,6 +198,8 @@ export function HauntedHouse() {
       <Graves />
 
       <Floor />
+
+      <fog attach="fog" args={["#262837", 1, 15]} />
     </Canvas>
   );
 }
