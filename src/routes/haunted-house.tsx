@@ -1,9 +1,11 @@
-import { OrbitControls, useTexture } from "@react-three/drei";
+import { Instance, Instances, OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, MeshProps } from "@react-three/fiber";
 import { folder, useControls } from "leva";
+import { useMemo } from "react";
 
 import * as wallAssets from "@/assets/haunted-house/textures/bricks";
 import * as doorAssets from "@/assets/haunted-house/textures/door";
+import * as graveAssets from "@/assets/haunted-house/textures/grave";
 
 function Bush(props: MeshProps) {
   return (
@@ -40,19 +42,59 @@ function Door() {
 }
 
 function Walls() {
-  const textureProps = {
-    ...useTexture({
-      map: wallAssets.color,
-      aoMap: wallAssets.ao,
-      normalMap: wallAssets.normal,
-      roughnessMap: wallAssets.roughness,
-    }),
-  };
+  const textureProps = useTexture({
+    map: wallAssets.color,
+    aoMap: wallAssets.ao,
+    normalMap: wallAssets.normal,
+    roughnessMap: wallAssets.roughness,
+  });
+
   return (
     <mesh name="walls" position={[0, 1.25, 0]}>
       <boxBufferGeometry args={[4, 2.5, 4]} />
       <meshStandardMaterial {...textureProps} />
     </mesh>
+  );
+}
+
+function Grave({ minRadius }: { minRadius: number }) {
+  const { rotationDelta, radiusDelta } = useControls("Grave", {
+    radiusDelta: { value: 3, min: 0, max: 10 },
+    rotationDelta: { value: 0.5, min: -1, max: 1 },
+  });
+
+  const { x, z, yRotation, zRotation } = useMemo(() => {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = minRadius + Math.random() * radiusDelta;
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius;
+    const yRotation = (Math.random() - 0.5) * rotationDelta;
+    const zRotation = (Math.random() - 0.5) * rotationDelta;
+    return { x, z, yRotation, zRotation };
+  }, [minRadius, radiusDelta, rotationDelta]);
+
+  return <Instance position={[x, 0.3, z]} rotation={[0, yRotation, zRotation]} />;
+}
+
+function Graves() {
+  const { number, minRadius } = useControls("Graves", {
+    number: { value: 50, min: 30, max: 100, step: 1 },
+    minRadius: { value: 3, min: 3, max: 7, step: 0.01 },
+  });
+
+  const textureProps = useTexture({
+    map: graveAssets.color,
+    roughnessMap: graveAssets.roughness,
+  });
+
+  return (
+    <Instances>
+      <boxGeometry args={[0.6, 0.8, 0.2]} />
+      <meshStandardMaterial {...textureProps} />
+      {Array.from({ length: number }, (_, i) => (
+        <Grave key={i} minRadius={minRadius} />
+      ))}
+    </Instances>
   );
 }
 
@@ -94,6 +136,9 @@ export function HauntedHouse() {
         <Bush name="bush-3" scale={[0.4, 0.4, 0.4]} position={[-0.8, 0.1, 2.2]} />
         <Bush name="bush-4" scale={[0.15, 0.15, 0.15]} position={[-0.1, 0.05, 2.6]} />
       </group>
+
+      <Graves />
+
       <mesh name="floor" rotation={[-Math.PI * 0.5, 0, 0]}>
         <planeBufferGeometry args={[20, 20]} />
         <meshStandardMaterial color="#a9c388" />
