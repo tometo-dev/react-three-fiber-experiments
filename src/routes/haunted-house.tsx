@@ -2,9 +2,11 @@ import { Instance, Instances, OrbitControls, useTexture } from "@react-three/dre
 import { Canvas, MeshProps } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 import { useMemo } from "react";
+import * as THREE from "three";
 
 import * as wallAssets from "@/assets/haunted-house/textures/bricks";
 import * as doorAssets from "@/assets/haunted-house/textures/door";
+import * as floorAssets from "@/assets/haunted-house/textures/grass";
 import * as graveAssets from "@/assets/haunted-house/textures/grave";
 
 function Bush(props: MeshProps) {
@@ -57,10 +59,45 @@ function Walls() {
   );
 }
 
+function Floor() {
+  const textures = useTexture({
+    map: floorAssets.color,
+    aoMap: floorAssets.ao,
+    normalMap: floorAssets.normal,
+    roughnessMap: floorAssets.roughness,
+  });
+
+  const textureProps = useMemo(() => {
+    textures.map.repeat.set(8, 8);
+    textures.aoMap.repeat.set(8, 8);
+    textures.normalMap.repeat.set(8, 8);
+    textures.roughnessMap.repeat.set(8, 8);
+
+    textures.map.wrapS = THREE.RepeatWrapping;
+    textures.aoMap.wrapS = THREE.RepeatWrapping;
+    textures.normalMap.wrapS = THREE.RepeatWrapping;
+    textures.roughnessMap.wrapS = THREE.RepeatWrapping;
+
+    textures.map.wrapT = THREE.RepeatWrapping;
+    textures.aoMap.wrapT = THREE.RepeatWrapping;
+    textures.normalMap.wrapT = THREE.RepeatWrapping;
+    textures.roughnessMap.wrapT = THREE.RepeatWrapping;
+
+    return textures;
+  }, [textures]);
+
+  return (
+    <mesh name="floor" rotation={[-Math.PI * 0.5, 0, 0]}>
+      <planeBufferGeometry args={[20, 20]} />
+      <meshStandardMaterial {...textureProps} />
+    </mesh>
+  );
+}
+
 function Grave({ minRadius }: { minRadius: number }) {
-  const { rotationDelta, radiusDelta } = useControls("Grave", {
-    radiusDelta: { value: 3, min: 0, max: 10 },
-    rotationDelta: { value: 0.5, min: -1, max: 1 },
+  const { rotation: rotationDelta, radius: radiusDelta } = useControls("Grave", {
+    radius: { value: 3, min: 0, max: 10 },
+    rotation: { value: 0.5, min: -1, max: 1 },
   });
 
   const { x, z, yRotation, zRotation } = useMemo(() => {
@@ -139,10 +176,7 @@ export function HauntedHouse() {
 
       <Graves />
 
-      <mesh name="floor" rotation={[-Math.PI * 0.5, 0, 0]}>
-        <planeBufferGeometry args={[20, 20]} />
-        <meshStandardMaterial color="#a9c388" />
-      </mesh>
+      <Floor />
     </Canvas>
   );
 }
