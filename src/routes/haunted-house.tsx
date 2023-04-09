@@ -2,6 +2,7 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import { Canvas, MeshProps } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 
+import * as wallAssets from "@/assets/haunted-house/textures/bricks";
 import * as doorAssets from "@/assets/haunted-house/textures/door";
 
 function Bush(props: MeshProps) {
@@ -24,7 +25,6 @@ function Door() {
       metalnessMap: doorAssets.metalness,
       roughnessMap: doorAssets.roughness,
     }),
-    metalness: 1,
     displacementScale: 0.1,
   };
 
@@ -36,6 +36,23 @@ function Door() {
         <meshStandardMaterial transparent {...textureProps} />
       </mesh>
     </>
+  );
+}
+
+function Walls() {
+  const textureProps = {
+    ...useTexture({
+      map: wallAssets.color,
+      aoMap: wallAssets.ao,
+      normalMap: wallAssets.normal,
+      roughnessMap: wallAssets.roughness,
+    }),
+  };
+  return (
+    <mesh name="walls" position={[0, 1.25, 0]}>
+      <boxBufferGeometry args={[4, 2.5, 4]} />
+      <meshStandardMaterial {...textureProps} />
+    </mesh>
   );
 }
 
@@ -63,10 +80,7 @@ export function HauntedHouse() {
       />
       <OrbitControls enableDamping />
       <group>
-        <mesh name="walls" position={[0, 1.25, 0]}>
-          <boxBufferGeometry args={[4, 2.5, 4]} />
-          <meshStandardMaterial color="brown" />
-        </mesh>
+        <Walls />
 
         <mesh name="roof" rotation={[0, Math.PI * 0.25, 0]} position={[0, 2.5 + 0.5, 0]}>
           <coneBufferGeometry args={[3.5, 1, 4]} />
