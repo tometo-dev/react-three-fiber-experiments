@@ -12,7 +12,7 @@ import * as graveAssets from "@/assets/haunted-house/textures/grave";
 function Bush(props: MeshProps) {
   return (
     <mesh castShadow {...props}>
-      <sphereBufferGeometry args={[1, 16, 16]} />
+      <sphereGeometry args={[1, 16, 16]} />
       <meshStandardMaterial color="#003300" />
     </mesh>
   );
@@ -28,25 +28,22 @@ function Walls() {
 
   return (
     <mesh name="walls" position={[0, 1.25, 0]} castShadow>
-      <boxBufferGeometry args={[4, 2.5, 4]} />
+      <boxGeometry args={[4, 2.5, 4]} />
       <meshStandardMaterial {...textureProps} />
     </mesh>
   );
 }
 
 function Door() {
-  const textureProps = {
-    ...useTexture({
-      map: doorAssets.color,
-      alphaMap: doorAssets.alpha,
-      aoMap: doorAssets.ao,
-      displacementMap: doorAssets.height,
-      normalMap: doorAssets.normal,
-      metalnessMap: doorAssets.metalness,
-      roughnessMap: doorAssets.roughness,
-    }),
-    displacementScale: 0.1,
-  };
+  const textureProps = useTexture({
+    map: doorAssets.color,
+    alphaMap: doorAssets.alpha,
+    aoMap: doorAssets.ao,
+    displacementMap: doorAssets.height,
+    normalMap: doorAssets.normal,
+    metalnessMap: doorAssets.metalness,
+    roughnessMap: doorAssets.roughness,
+  });
 
   return (
     <>
@@ -62,8 +59,8 @@ function Door() {
         shadow-camera-far={7}
       />
       <mesh name="door" position={[0, 1, 2.001]} receiveShadow>
-        <planeBufferGeometry args={[2, 2, 100, 100]} />
-        <meshStandardMaterial transparent {...textureProps} />
+        <planeGeometry args={[2.2, 2.2, 100, 100]} />
+        <meshStandardMaterial transparent displacementScale={0.1} {...textureProps} />
       </mesh>
     </>
   );
@@ -98,7 +95,7 @@ function Floor() {
 
   return (
     <mesh name="floor" rotation-x={-Math.PI * 0.5} receiveShadow>
-      <planeBufferGeometry args={[40, 40]} />
+      <planeGeometry args={[40, 40]} />
       <meshStandardMaterial {...textureProps} />
     </mesh>
   );
@@ -183,7 +180,7 @@ export function HauntedHouse() {
         <Walls />
 
         <mesh name="roof" rotation-y={Math.PI * 0.25} position={[0, 2.5 + 0.5, 0]}>
-          <coneBufferGeometry args={[3.5, 1, 4]} />
+          <coneGeometry args={[3.5, 1, 4]} />
           <meshStandardMaterial color="#b35f45" />
         </mesh>
 

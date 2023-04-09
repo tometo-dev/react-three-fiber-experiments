@@ -9,7 +9,7 @@ specifiers:
   '@types/three': ^0.150.1
   '@typescript-eslint/eslint-plugin': ^5.57.1
   '@typescript-eslint/parser': ^5.57.1
-  '@vitejs/plugin-react-swc': ^3.2.0
+  '@vitejs/plugin-react-swc': ^3.3.0
   autoprefixer: 10.4.14
   eslint: ^8.38.0
   eslint-config-prettier: ^8.8.0
@@ -47,7 +47,7 @@ devDependencies:
   '@types/three': 0.150.1
   '@typescript-eslint/eslint-plugin': 5.57.1_z2kgtpg43567unkcwpmcdtgh2q
   '@typescript-eslint/parser': 5.57.1_voubu7prgxjfsfbgx5d4sqnwiy
-  '@vitejs/plugin-react-swc': 3.2.0_vite@4.2.1
+  '@vitejs/plugin-react-swc': 3.3.0_vite@4.2.1
   autoprefixer: 10.4.14_postcss@8.4.21
   eslint: 8.38.0
   eslint-config-prettier: 8.8.0_eslint@8.38.0
@@ -1068,8 +1068,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@vitejs/plugin-react-swc/3.2.0_vite@4.2.1:
-    resolution: {integrity: sha512-IcBoXL/mcH7JdQr/nfDlDwTdIaH8Rg7LpfQDF4nAht+juHWIuv6WhpKPCSfY4+zztAaB07qdBoFz1XCZsgo3pQ==}
+  /@vitejs/plugin-react-swc/3.3.0_vite@4.2.1:
+    resolution: {integrity: sha512-Ycg+n2eyCOTpn/wRy+evVo859+hw7qCj9iaX5CMny6x1fx1Uoq0xBG+a98lFtwLNGfGEnpI0F26YigRuxCRkwg==}
     peerDependencies:
       vite: ^4
     dependencies:
